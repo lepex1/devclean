@@ -1,0 +1,37 @@
+[package]
+name = "devclean"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+description = "Dev Cache & Artifact Cleaner — find and safely remove build artifacts and caches"
+license = "MIT"
+repository = "https://github.com/lepex1/devclean"
+readme = "README.md"
+keywords = ["cleanup", "cache", "build-artifacts", "cli", "tui"]
+categories = ["command-line-utilities", "development-tools"]
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+jwalk = "0.8"
+walkdir = "2"
+rayon = "1"
+dialoguer = "0.11"
+indicatif = "0.17"
+comfy-table = "7"
+humansize = "2"
+owo-colors = "4"
+ctrlc = "3"
+log = "0.4"
+simplelog = "0.12"
+ratatui = "0.30"
+
+[dev-dependencies]
+tempfile = "3"
+
+[lints.rust]
+unsafe_code = "warn"
+
+[lints.clippy]
+all = "warn"
+pedantic = "warn"
