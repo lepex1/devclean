@@ -1,97 +1,123 @@
-<a href="README.md">Русский</a> · <b>English</b>
+<p align="center">
+  <a href="README.md">Русский</a> · <b>English</b>
+</p>
 
 # devclean
 
-<!-- BANNER SLOT: assets/banner.png (2560×720, show as width="1280") then uncomment.
+<!-- BANNER SLOT: add assets/banner.en.png (2560×720, show as width="1280") then uncomment.
 <p align="center">
-  <img src="assets/banner.png" alt="devclean — find and safely remove build artifacts" width="1280">
+  <img src="assets/banner.en.png" alt="devclean — finds and safely removes build artifacts" width="1280">
 </p>
 -->
 
-![License: MIT](https://img.shields.io/badge/license-MIT-green)
-![Rust](https://img.shields.io/badge/rust-1.88%2B-orange)
-![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
+<p align="center">
+  <img src="https://img.shields.io/badge/version-0.1.0-22d3ee" alt="version">
+  <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-0078D6" alt="platform">
+  <img src="https://img.shields.io/badge/rust-1.88%2B-B7410E" alt="rust">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/lepex1/devclean?color=22d3ee" alt="license"></a>
+</p>
 
-**Finds and safely removes build artifacts and caches** — `node_modules`, `target`, `.venv`, `__pycache__`, `bin`/`obj`, `dist` and more. Launched without arguments on a terminal, it opens a full-screen TUI: folder → filters → scan → pick → delete.
+<p align="center">
+  <b>Finds build artifacts and caches across your projects folder,<br>
+  shows the size and age of each one, and deletes only what you tick.</b>
+</p>
 
 ## Demo
 
 <p align="center">
-  <img src="assets/demo.gif" alt="devclean demo" width="1000">
+  <img src="assets/demo.gif" alt="devclean in action: pick a folder, set filters, scan, tick items, delete" width="1000">
 </p>
+
+---
+
+## Why it exists
+
+After a few months of work a projects folder easily grows to tens of gigabytes: a `node_modules` per frontend, a `target` per Rust crate, `bin`/`obj` per .NET build. Cleaning it by hand is slow and risky — it is easy to hit the wrong directory.
+
+`devclean` does it for you:
+
+1. **Walks the tree in parallel** (`jwalk` + `rayon`) and never descends into an artifact it has already found, so nested directories are not counted twice.
+2. **Only confirmed directories count as artifacts**: `target` next to `Cargo.toml` or `pom.xml`, `bin`/`obj` next to a project file, `build` next to `build.gradle`. A personal folder with the same name is left alone.
+3. **Measures size and age** in parallel; symlinks are skipped during measurement.
+4. **Shows the list** in a full-screen TUI with ecosystem, size and age filters — or as a plain table in the CLI.
+5. **Deletes only what you tick**: the path is canonicalized (Windows long paths), read-only attributes are cleared, removal is retried on transient locks, and a symlink is removed as a link.
+
+On a real folder of ~35 projects a typical run finds **66 artifacts taking 13.5 GB**.
+
+---
 
 ## Screenshot
 
 <p align="center">
-  <img src="assets/screenshot.png" alt="devclean full-screen TUI with the artifact list" width="1000">
+  <img src="assets/screenshot.png" alt="devclean full-screen TUI with the list of found artifacts" width="1000">
 </p>
 
-## Why
+---
 
-After a few months of work a projects folder easily grows to tens of gigabytes: a `node_modules` per frontend, a `target` per Rust crate, `bin`/`obj` per .NET build. Cleaning it by hand is slow and risky — it is easy to hit the wrong directory.
+## Compatibility
 
-devclean walks the tree, finds only known artifacts (by name **and** by marker files next to them), shows the size and age of each one, and deletes only what you tick.
-
-## Features
-
-| | |
+| Item | Value |
 |---|---|
-| **Full-screen TUI** | Double-click the exe or run `devclean` with no arguments: folder, filters, scan, checklist, delete. The window stays open after a clean. |
-| **Parallel scan** | `jwalk` + `rayon`: tree walking and size measurement run in parallel, and found artifacts are not walked again. |
-| **Marker-aware detection** | `target` counts only next to `Cargo.toml` or `pom.xml`; `bin`/`obj` only next to a project file. Personal folders with the same names are left alone. |
-| **Filters** | By ecosystem, minimum size, age and glob excludes. Type and exclude filters run before measurement, so irrelevant gigabytes are never walked. |
-| **Safe deletion** | Symlinks and junctions are deleted as links, never followed. Disk roots, the home root and system directories are refused. Confirmation before deleting. |
-| **CLI and TUI** | One engine: scripts use flags, humans use the full-screen UI. |
-| **Log next to the exe** | `devclean.log` is written next to the binary (fallback: working directory) and rotates at 10 MB. |
+| **OS** | Windows 10/11 — tested. Linux and macOS — the code is cross-platform and builds, but has mostly been tested on Windows |
+| **Modes** | Full-screen TUI (double-click the exe), interactive checklist, table plus flags for scripts |
+| **Detection** | Known directory names only, each confirmed by marker files next to it |
+| **Deletion** | No recycle bin. Symlinks and junctions are removed as links, their target stays |
+| **Log** | `devclean.log` next to the exe (fallback: working directory), rotates at 10 MB |
+| **Build** | Rust 1.88+ (edition 2024) |
 
-## Compatibility and requirements
+---
 
-- **Windows 10/11** — the primary, tested platform.
-- **Linux and macOS** — the code is cross-platform but has mostly been tested on Windows.
-- **Build:** Rust 1.88+ (edition 2024).
-- A prebuilt `devclean.exe` is available under Releases (after the first release).
+## Quick start (Windows)
 
-## Installation
+1. Download **`devclean.exe`** from the **[Releases](https://github.com/lepex1/devclean/releases/latest)** page — or build it yourself, it is one command (see below).
+2. Double-click the file: the full-screen TUI opens and the window stays open after a clean.
+3. **Step 1/2 — folder:** type the path to your projects folder and press Enter. The last folder is remembered.
+4. **Step 2/2 — filters:** `o` age, `m` minimum size, `t` ecosystem. Optional: Enter scans right away.
+5. **List:** tick what you need with `Space`, press Enter, confirm with `y`.
 
-### Prebuilt binary
+**Where the log is:** `devclean.log` next to the `.exe` (and `devclean.log.1` after rotation). The program writes nothing else: no settings, no installation.
 
-Download `devclean.exe` from Releases and run it. No installation: the program writes nothing except the log and the last-folder file next to the exe.
+---
 
-### From source
+## Build from source
 
-```sh
-git clone https://github.com/lepex1/devclean
+```bash
+git clone https://github.com/lepex1/devclean.git
 cd devclean
 cargo build --release
 ```
 
-The binary ends up in `target/release/devclean.exe` (Windows) or `target/release/devclean`.
+The binary ends up in `target/release/devclean.exe` (Windows) or `target/release/devclean`. **Requirements:** Rust 1.88+, and the MSVC toolchain on Windows.
+
+### Checks before building
+
+```bash
+cargo test                                  # 56 tests
+cargo clippy --all-targets -- -D warnings
+cargo fmt --check
+```
+
+---
 
 ## Usage
 
 ### Full-screen mode
 
-Double-click the exe, or run `devclean` with no arguments in a terminal.
-
-1. **Folder** — type a path (Enter to continue). The last used folder is remembered.
-2. **Filters** — `o` age, `m` minimum size, `t` ecosystem; Enter to scan.
-3. **List** — tick what you need, press Enter, then `y`.
-
 | Key | Action |
 |---|---|
-| `↑`/`↓` or `j`/`k` | Move through the list |
+| `↑` / `↓` or `j` / `k` | Move through the list |
 | `Space` | Tick/untick the row |
 | `a` / `n` | Tick all visible / untick all visible |
-| `/` | Filter by path and ecosystem |
+| `/` | Live filter by path and ecosystem |
 | `s` | Sort: size ↓ → age (oldest first) → ecosystem → path |
-| `Enter` | Delete ticked items (then `y` to confirm) |
+| `Enter` | Delete ticked items, then `y` to confirm |
 | `q` / `Esc` | Quit without deleting |
 
-Command keys work regardless of Caps Lock.
+Command keys work regardless of Caps Lock. The TUI needs a real terminal: when launched through a pipe the program reports an error instead of hanging.
 
 ### CLI
 
-```sh
+```bash
 devclean                                  # full-screen TUI
 devclean D:/projects                      # scan and print a table
 devclean D:/projects --older-than 30d --min-size 100MB
@@ -116,7 +142,36 @@ devclean --menu                           # the old step-by-step menu
 
 Exit codes: `0` success, `1` error or some artifacts failed to delete, `2` invalid arguments, `130` interrupted by Ctrl+C (partial result).
 
-### What gets detected
+---
+
+## How it works
+
+```mermaid
+flowchart TD
+    A[Scan root] --> B[Parallel walk<br/>jwalk]
+    B --> C{Directory name<br/>in the rule table?}
+    C -->|no| B
+    C -->|yes| D{Marker nearby?<br/>Cargo.toml, .csproj, build.gradle…}
+    D -->|no| B
+    D -->|yes| E[Artifact found<br/>subtree pruned from the walk]
+    E --> F[Parallel measurement<br/>size + mtime]
+    F --> G[Filters<br/>ecosystem, size, age, exclude]
+    G --> H[TUI picker or CLI table]
+    H --> I[Deletion<br/>canonicalize → clear read-only → retry]
+    I --> J[devclean.log]
+```
+
+What makes the detection different from "delete everything called build":
+
+- **Confirmation by markers**: the directory name is only a hint, a file next to it decides. Without a marker the directory is not an artifact.
+- **Filters before measurement**: `--type` and `--exclude` prune branches during the walk, so gigabytes of other ecosystems are never even measured.
+- **Safe links**: when deleting, a symlink or junction is removed itself; its target is never entered.
+- **Root guard**: scanning a disk root, the whole home directory, `C:\Windows` or `Program Files` is refused.
+- **Every decision is logged**: found / measured / filtered / removed / failed — with the path and the reason.
+
+---
+
+## What gets detected
 
 | Ecosystem | Directories |
 |---|---|
@@ -128,15 +183,9 @@ Exit codes: `0` success, `1` error or some artifacts failed to delete, `2` inval
 | Python | `.venv`, `venv`, `env`, `__pycache__`, `.pytest_cache`, `.mypy_cache` |
 | Generic | `dist` (with `pyproject.toml`) |
 
-## How it works
+---
 
-- The tree walk is parallel; a found artifact is pruned from the walk immediately so nested directories are not counted twice.
-- Size and modification time are measured in parallel; symlinks are skipped during measurement.
-- Before deletion the path is canonicalized (Windows long paths), read-only attributes are cleared, and the removal is retried on transient locks.
-- A symlink or junction is removed as a link: its target stays untouched.
-- Every decision (found / measured / filtered / removed / failed) goes to `devclean.log`.
-
-## Limitations and safety
+## ⚠️ Things to know
 
 - **Deletion is permanent** — no recycle bin. Check `--dry-run` or the TUI list first.
 - **`--all --yes` deletes without per-item confirmation.** Use it deliberately.
@@ -144,6 +193,8 @@ Exit codes: `0` success, `1` error or some artifacts failed to delete, `2` inval
 - **Backups and `tmp` folders inside the scan root are found too** — exclude them with `--exclude`.
 - **Linux/macOS** build, but are tested less than Windows.
 - The log runs at Trace level: it grows quickly during active use, but rotates at 10 MB (one previous file is kept).
+
+---
 
 ## FAQ
 
@@ -162,10 +213,19 @@ That type is not supported yet: the `build` rule requires Gradle markers, otherw
 **Does it follow symlinks?**
 No. When deleting, the link itself is removed and its target stays.
 
-## License
-
-MIT — see [LICENSE](LICENSE). Dependencies are distributed under MIT, Apache-2.0, BSD and Unlicense.
+**Can I run it on a schedule?**
+Yes: `devclean D:/projects --older-than 30d --type node --all --yes --dry-run` prints the plan, and the same call without `--dry-run` performs it.
 
 ---
 
-Made by [lepex1](https://lepex.vercel.app/)
+## License
+
+[MIT](LICENSE) — use it, fork it, change it.
+
+Dependencies are distributed under MIT, Apache-2.0, BSD and Unlicense.
+
+---
+
+<p align="center">
+  Made by <a href="https://lepex.vercel.app/">lepex1</a>
+</p>
