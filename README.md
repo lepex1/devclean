@@ -16,19 +16,15 @@
 
 ## Демонстрация
 
-<!-- ДЕМО-СЛОТ: записать assets/demo.gif (реальный запуск, до 5 МБ) и раскомментировать.
 <p align="center">
-  <img src="assets/demo.gif" alt="Демонстрация работы devclean" width="880">
+  <img src="assets/demo.gif" alt="Демонстрация работы devclean" width="1000">
 </p>
--->
 
 ## Скриншот
 
-<!-- СКРИНШОТ-СЛОТ: положить assets/screenshot.png (реальный TUI) и раскомментировать.
 <p align="center">
-  <img src="assets/screenshot.png" alt="Полноэкранный TUI devclean со списком артефактов" width="893">
+  <img src="assets/screenshot.png" alt="Полноэкранный TUI devclean со списком артефактов" width="1000">
 </p>
--->
 
 ## Зачем это нужно
 

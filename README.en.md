@@ -16,19 +16,15 @@
 
 ## Demo
 
-<!-- DEMO SLOT: record assets/demo.gif (real run, up to 5 MB) and uncomment.
 <p align="center">
-  <img src="assets/demo.gif" alt="devclean demo" width="880">
+  <img src="assets/demo.gif" alt="devclean demo" width="1000">
 </p>
--->
 
 ## Screenshot
 
-<!-- SCREENSHOT SLOT: add assets/screenshot.png (real TUI) and uncomment.
 <p align="center">
-  <img src="assets/screenshot.png" alt="devclean full-screen TUI with the artifact list" width="893">
+  <img src="assets/screenshot.png" alt="devclean full-screen TUI with the artifact list" width="1000">
 </p>
--->
 
 ## Why
 
